@@ -22,12 +22,3 @@
 
 Route::get('/', 'MapController@index');
 Route::post('/', 'MapController@index');
-
-Route::get('/behavior', 'MapController@behavior');
-Route::post('/behavior', 'MapController@behavior');
-
-Route::get('/adl', 'MapController@adl');
-Route::post('/adl', 'MapController@adl');
-
-Route::get('/osteoarthritis', 'MapController@osteoarthritis');
-Route::post('/osteoarthritis', 'MapController@osteoarthritis');
