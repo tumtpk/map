@@ -22,3 +22,6 @@
 
 Route::get('/', 'MapController@index');
 Route::post('/', 'MapController@index');
+
+Route::get('/form/{formId}', 'MapController@evaluation');
+Route::post('/form/{formId}', 'MapController@evaluation');

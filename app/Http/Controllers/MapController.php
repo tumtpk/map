@@ -27,7 +27,38 @@ class MapController extends Controller
     	$villages = Village::all()->sortBy('village');
 		
     	return view('map.index')->with('villages',$villages)->with('select', $select)->with('homeNo', $homeNo)
-    		->with('firstname', $firstname)->with('lastname', $lastname);
+    		->with('firstname', $firstname)->with('lastname', $lastname)->with('evoluationPart', $this->getEvoluationPart())
+    		->with('evoluationForm', $this->getEvoluationForm());
+    }
+     
+    public function getEvoluationPart()
+    {
+    	$evoluationPart = DB::table('evoluation_part')->get();
+    	return $evoluationPart;
+    }
+    
+    public function getEvoluationForm()
+    {
+    	$evoluationForm = DB::table('evoluation_form')->get();
+    	$evoluationPart = $this->getEvoluationPart();
+    	
+    	//crate array menu part
+    	$arrEvoluationForm = [];
+    	foreach ($evoluationPart as $part){
+    		$arrEvoluationForm[$part->id] = [];
+    	}
+    	
+    	foreach ($evoluationForm as $obj){
+    		$arrForm = [];
+    		$arrForm['id'] = $obj->id;
+    		$arrForm['name'] = $obj->name;
+    		array_push($arrEvoluationForm[$obj->part_id], $arrForm);
+    	}
+    	return $arrEvoluationForm;
+    }
+    
+    public function evaluation($formId){
+    	dd($formId);
     }
       
 }

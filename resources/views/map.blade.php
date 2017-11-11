@@ -2,82 +2,118 @@
     <head>
         <meta charset="utf-8"  name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title')</title>
-        <link rel="stylesheet" href="assets/css/main.css" />
-        <link rel="stylesheet" href="assets/css/table.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+        
         @yield('css')
         <style type="text/css">
-        	.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
-			    background-color: rgba(231, 231, 231, 0.16);
-			}
+			.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
         </style>
     </head>
-    <body class="left-sidebar">
-    	
-    	<div id="page-wrapper">
-		    
-		    <!-- Header -->
-			<div id="header-wrapper">
-				<div id="header" class="container" style="padding-top: 70px;padding-bottom: 100px;">
-					
-					<!-- Logo -->
-						<h1 id="logo" style="color: #888888;letter-spacing: 5px;">สารสนเทศเชิงพื้นที่ของผู้สูงอายุ</h1>
-
-					<!-- Nav -->
-						<nav id="nav" style="padding-top: 80px;">
-							<ul>
-								<li><a class="icon fa-angle-left" href="{{url('')}}"><span>บันทึกสุขภาพผู้สูงอายุ</span></a></li>
-								<li class="@yield('first')"><a class="icon fa-home" href="{{url('')}}"><span>ตำแหน่งพิกัดของบ้าน</span></a></li>
-								<li class="@yield('second')"><a class="icon fa-child" href="behavior"><span>พฤติกรรมสุขภาพ</span></a></li>
-								<li class="@yield('third')">
-									<a href="#" class="icon fa-bar-chart-o"><span>การประเมินสุขภาพผู้สูงอายุ</span></a>
-									<ul>
-										<li><a href="adl">การดำเนินชีวิตประจำวัน</a></li>
-										<li><a href="osteoarthritis">ข้อเข่าเสื่อม</a></li>
-									</ul>
-								</li>
-								<li class="">
-									<a href="#" class="icon fa-sign-out"><span>หฤษฎ์ คงทอง</span></a>
-									<ul>
-										<li><a href="adl">ออกจากระบบ</a></li>
-									</ul>
-								</li>
-							</ul>
-						</nav>
-				</div>
-			</div>
+    <body>
+ 		 <nav class="navbar navbar-inverse navbar-fixed-top">
+		      <div class="container">
+		        <div class="navbar-header">
+		          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		            <span class="sr-only">Toggle navigation</span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		          </button>
+		          <a class="navbar-brand" href="#">
+		          	<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> 
+		          	บันทึกสุขภาพผู้สูงอายุ
+		          </a>
+		        </div>
+		        <div id="navbar" class="navbar-collapse collapse">
+		          <ul class="nav navbar-nav">
+		            <li class="active"><a href="#">ตำแหน่งพิกัดของบ้าน</a></li>
+		            <li><a href="#">พฤติกรรมสุขภาพ</a></li>
+		            <li><a href="#">อสม.</a></li>
+		            @yield('menu')	
+		          </ul>
+		        </div><!--/.nav-collapse -->
+		      </div>
+		    </nav>
+			
+			<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			    <!-- Main jumbotron for a primary marketing message or call to action -->
+			    <div class="jumbotron">
+			      <div class="container">
+			        <h1 style="font-family: 'Arvo';font-weight: 700;color: #888888;text-shadow: 0.05em 0.075em 0 rgba(0, 0, 0, 0.1);text-align: -webkit-center;">
+			        	สารสนเทศเชิงพื้นที่ของผู้สูงอายุ
+			        </h1>
+			      </div>
+			    </div>
+			    
+			    
+			    @yield('content')
 				
-				
-		    <div id="main-wrapper" style="background-color: #f9f9f9;padding-top: 30px;padding-bottom: 60px;">
-				<div id="main" class="container">
-	        	@yield('content')
-	        	</div>
-	        </div>
-	        
-	        <!-- Footer -->
-			<div id="footer">
-				<div id="copyright" class="container" style="padding-top: 40px;">
-					<ul class="links">
-						<li>&copy; Software Engineering, School of Infomatics, Walailak University</li>
-					</ul>
-				</div>
-			</div>
+				<hr>
+		      <footer>
+		        <p class="text-center">© Software Engineering, School of Infomatics, Walailak University</p>
+		      </footer>
+		    </div>
 		
-		</div>
+		      
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
         
-        <script src="js/jquery-3.2.1.js"></script>
-        <script src="js/jquery.redirect.js"></script>
-        <script src="assets/js/jquery.dropotron.min.js"></script>
-		<script src="assets/js/skel.min.js"></script>
-		<script src="assets/js/skel-viewport.min.js"></script>
-		<script src="assets/js/util.js"></script>
-		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-		<script src="assets/js/main.js"></script>
+        <script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyDXPSZi00oTyASzmu_SzAoA9r2H4zQqT6U&amp;callback=myMap"></script>
+        
 		<script type="text/javascript">
+		
 		$(function(){
-		    $("<script/>", {
-		      "type": "text/javascript",
-		      src: "http://maps.google.com/maps/api/js?v=3.2&key=AIzaSyDXPSZi00oTyASzmu_SzAoA9r2H4zQqT6U&callback=myMap"
-		    }).appendTo("body");    
+// 		    $("<script/>", {
+// 		      "type": "text/javascript",
+// 		      src: "http://maps.google.com/maps/api/js?key=AIzaSyDXPSZi00oTyASzmu_SzAoA9r2H4zQqT6U&callback=myMap"
+// 		    }).appendTo("body");    
 		});
 		</script>
         @yield('js')

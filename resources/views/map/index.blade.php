@@ -1,26 +1,37 @@
 @extends('map')
-
 @section('title', 'ตำแหน่งพิกัดของบ้าน')
-	<link rel="stylesheet" href="css/bootstrap.css">
-	<style type="text/css">
-		.row {
-			margin-right: 0px; 
-			margin-left: 0px; 
-			padding-top: 10px
-		}
-	</style>
-@section('css')
-
+@section('menu')
+<li>
+	<a href="#" class="dropdown-toggle" data-toggle="dropdown">การประเมิน<b class="caret"></b></a>
+	<ul class="dropdown-menu dropdown-menu-right">
+		<?php foreach ($evoluationPart as $part){ 
+			$form = $evoluationForm[$part->id];
+			$size = sizeof($form);
+			$isShowSubMenu = ($size>0)?true:false;
+		?>
+			<?php if($isShowSubMenu){ ?>
+			<li class="dropdown-submenu">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{$part->name}}</a>
+				<ul class="dropdown-menu">
+				<?php for ($i=0;$i<$size;$i++){ ?>
+					<li><a href="form/{{$form[$i]['id']}}">{{$form[$i]['name']}}</a></li>
+				<?php } ?>
+				</ul>
+			</li>
+			<?php } ?>
+		<?php } ?>
+	</ul>
+</li>
 @endsection
-
 @section('content')
-
 @section('first', 'active')
-<h1>ตำแหน่งพิกัดบ้าน</h1>
+<div class="page-header">
+	<h1>ตำแหน่งพิกัดบ้าน</h1>
+</div>
 <div class="row">
 
 	<!-- Sidebar -->
-		<div id="sidebar" class="4u 12u(mobile)">
+		<div id="sidebar" class="col-md-4">
 			<section>
 				<div class="panel panel-default" style="max-height: 600px;">
 
@@ -28,7 +39,7 @@
 						ข้อมูลทั่วไป
 					</div>
 		
-				  	<div class="panel-heading">
+				  	<div class="panel-body">
 				  		<form action="" method="post">
 				  			{{ csrf_field() }}
 							<div class="form-group">
@@ -51,12 +62,12 @@
 							    <!-- <label for="exampleInputEmail1">Email address</label> -->
 							    <input type="text" id="lastname" name="lastname" class="form-control" placeholder="นามสกุล" value="{{$lastname}}" disabled="disabled">
 							</div>
-							<button type="submit" id="search" class="btn btn-info">ค้นหา</button> &nbsp; จำนวนที่ค้นพบ .. รายการ
+							<div class="text-right">
+							 	จำนวนที่ค้นพบ .. รายการ &nbsp;&nbsp;  <button type="submit" id="search" class="btn btn-info">ค้นหา</button>
+							</div>
 				  		</form>
-		
-				  		</div>
-		
-				  		<div class="panel-body" style="height: 500px;">
+				  		<hr>
+				  		<div style="height: 300px;">
 				  			<div id="table-wrapper">
 				  				<input id="checkAll" type="checkbox" checked style="margin-left: 6px;"> <small style="font-size: smaller;">เลือกทั้งหมด</small>
 							  <div id="table-scroll">
@@ -71,12 +82,13 @@
 							  </div>
 							</div>
 				  		</div>
+				  	</div>
 				</div>
 			</section>
 		</div>
 
 	<!-- Content -->
-		<div id="content" class="8u 12u(mobile) important(mobile)" style="padding-left: 10px;">
+		<div id="content" class="col-md-8" style="padding-left: 10px;">
 			<section>
 				<div id="googleMap" style="width:100%;height:600px;"></div>
 			</section>
@@ -88,24 +100,20 @@
 @endsection
 
 @section('js')
-	
-<!-- 	<script async defer -->
-<!--     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXPSZi00oTyASzmu_SzAoA9r2H4zQqT6U&callback=myMap"></script> -->
-<!-- 	<script src="js/bootstrap.js"></script> -->
-	
 	<script>
-		
-		function myMap() {
-			var markers = [];
-			var map = new google.maps.Map(document.getElementById('googleMap'), {
-	          	mapTypeId: 'terrain',
-	          	draggable: true,
-	          	zoomControl: true,
-	          	streetViewControl: false
-	        });
 
+		function myMap() {
+		    var uluru = {lat: -25.363, lng: 131.044};
+		    var map = new google.maps.Map(document.getElementById('googleMap'), {
+		      zoom: 4,
+		      center: uluru
+		    });
+		    var marker = new google.maps.Marker({
+		      position: uluru,
+		      map: map
+		    });
 		}
-				
-			</script>
+		
+	</script>
 @endsection
 
