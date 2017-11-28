@@ -20,8 +20,8 @@
 // });
 
 
-Route::get('/', 'MapController@index');
-Route::post('/', 'MapController@index');
+Route::get('/health', 'HealthController@index');
+Route::post('/health', 'HealthController@index');
 
-Route::get('/form/{formId}', 'MapController@evaluation');
-Route::post('/form/{formId}', 'MapController@evaluation');
+Route::get('/form/{formId}', 'HealthController@evaluation');
+Route::post('/form/{formId}', 'HealthController@evaluation');
