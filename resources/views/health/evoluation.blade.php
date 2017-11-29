@@ -1,5 +1,6 @@
-@extends('map')
-@section('title', 'ตำแหน่งพิกัดของบ้าน')
+@extends('evoluation')
+@section('title')
+	{{$formName}}@endsection;
 @section('menu')
 <li>
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">การประเมิน<b class="caret"></b></a>
@@ -14,7 +15,7 @@
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{$part->name}}</a>
 				<ul class="dropdown-menu">
 				<?php for ($i=0;$i<$size;$i++){ ?>
-					<li><a href="form/{{$form[$i]['id']}}">{{$form[$i]['name']}}</a></li>
+					<li><a href="../form/{{$form[$i]['id']}}">{{$form[$i]['name']}}</a></li>
 				<?php } ?>
 				</ul>
 			</li>
@@ -24,9 +25,8 @@
 </li>
 @endsection
 @section('content')
-@section('first', 'active')
 <div class="page-header">
-	<h2>ตำแหน่งพิกัดบ้าน</h2>
+	<h2>{{$formName}}</h2>
 </div>
 <div class="row">
 
@@ -106,12 +106,12 @@
 
 </div>
 
-
 @endsection
 
 @section('js')
+	
 	<script>
-
+		
 		function myMap() {
 			var markers = [];
 			var map = new google.maps.Map(document.getElementById('googleMap'), {
@@ -123,7 +123,7 @@
 	          	streetViewControl: false
 	        });
 
-			// Define the LatLng coordinates for the polygon's path.
+        	// Define the LatLng coordinates for the polygon's path.
         	var triangleCoords = <?=$edgeCoord?>;
 
 	        function coords() {
@@ -159,7 +159,7 @@
 	        var bermudaTriangle;
 	        var color = <?=$color?>;
 	        if({{$isNotSelect}}){
-				var arrEdgeCoords = <?=$arrEdgeCoords ?>;
+	        	var arrEdgeCoords = <?=$arrEdgeCoords ?>;
 			    var arrVillage = <?=$arrVillage?>;
 			    var arrCenterCoord = <?=$arrCenterCoord?>;
 			    var index = 0;
@@ -183,7 +183,7 @@
 						icon: icon,
 						label: "หมู่ที่ "+arrVillage[index]
 					});
-
+					
 			        bermudaTriangle.setMap(map);
 
 			        google.maps.event.addListener(bermudaTriangle, 'click', function (event) {
@@ -213,14 +213,6 @@
 				var dataPatient = <?=$dataPatient ?>;
 				var village = $('#village').val();
 				getLatLng().forEach(function(data) {
-					marker = new google.maps.Marker({
-					   position: new google.maps.LatLng(data.lat, data.lng),
-					   map: map,
-					   icon: icon,
-					   title: data.homeNo
-					});
-
-					markers.push(marker);
 
 					var content = '<table class=\"table\" style=\"margin-bottom: 0px;\">'+
 						'<tr>'+
@@ -240,22 +232,32 @@
 								'<table class=\"table table-bordered table-striped"\">'+
 									'<tr>'+
 										'<th style=\"text-align: center;\">ชื่อ-สกุล</th>'+
-										'<th style=\"text-align: center;\">วันเกิด</th>'+
 										'<th style=\"text-align: center;\">อายุ</th>'+
+										'<th style=\"text-align: center;\">ผลการประเมิน</th>'+
 									'</tr>';
-									
+									var icon = "../images/green.png";
 									dataPatient[data.homeNo].forEach(function(patient) {
-										content += '<tr>'+
-											'<td>'+patient.name+'</td>'+
-											'<td style=\"text-align: center;\">'+patient.birthday+'</td>'+
+										console.log(patient);
+										content += '<tr style=\"background-color:'+patient.row+';\">'+
+											'<td class=\"text-center\">'+patient.name+'</td>'+
 											'<td style=\"text-align: center;\">'+patient.age+'</td>'+
+											'<td style=\"text-align: center;\">'+patient.result+'</td>'+
 										'</tr>';
 									});
-									
 						content += '</table>'+
 							'</td>'+
 						'</tr>'+
 						'</table>';
+						
+						marker = new google.maps.Marker({
+							position: new google.maps.LatLng(data.lat, data.lng),
+							map: map,
+							icon: icon,
+							title: data.homeNo
+						});
+
+						markers.push(marker);
+							
 					info = new google.maps.InfoWindow();
 
 				  	google.maps.event.addListener(marker, 'click', (function(marker, i) {
@@ -265,6 +267,20 @@
 						}
 				  	})(marker, i++));
 				})
+			}
+
+			function getColor(patient){
+				var color;
+				if(patient == 4){
+					color = 'rgba(255, 0, 0, 0.24)';
+				}else if(patient == 5){
+					color = 'rgba(255, 71, 0, 0.24)';
+				}else if(patient == 6){
+					color = 'rgba(255, 129, 0, 0.24)';
+				}else{
+					color = 'rgba(0, 255, 20, 0.24)';
+				}
+				return color;
 			}
 
 			function init(){
@@ -302,7 +318,7 @@
 		   		if(check){
 		   			google.maps.event.trigger(markers[index], "click");
 		   		}
-			});
+			})
 
 			$('#village').change(function(val){
 				clearSearch();
@@ -327,8 +343,8 @@
 					$("#lastname").prop('disabled', false);
 				}
 		   	}
+		   	
 		}
-		
-	</script>
+				
+			</script>
 @endsection
-

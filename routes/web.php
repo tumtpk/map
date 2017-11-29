@@ -23,5 +23,11 @@
 Route::get('/health', 'HealthController@index');
 Route::post('/health', 'HealthController@index');
 
-Route::get('/form/{formId}', 'HealthController@evaluation');
-Route::post('/form/{formId}', 'HealthController@evaluation');
+Route::get('/form/{formId}', 'HealthController@evoluation');
+Route::post('/form/{formId}', 'HealthController@evoluation');
+
+Route::get('/behavior', 'HealthController@behavior');
+Route::post('/behavior', 'HealthController@behavior');
+
+Route::get('/volunteer', 'HealthController@volunteer');
+Route::post('/volunteer', 'HealthController@volunteer');

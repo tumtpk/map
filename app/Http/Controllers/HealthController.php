@@ -13,6 +13,89 @@ use App\AppDefault;
 class HealthController extends Controller
 {
 	
+	public function volunteer(Request $request){
+		
+		$village = $request->input('village');
+		$firstname = $request->input('firstname');
+		$lastname = $request->input('lastname');
+		
+		$villages = AppDefault::getArrayVillage();
+		
+		$volunteer;
+		if($village != null){
+			
+		}
+		$numberOfHomeNo = 0;
+		
+		
+		return view('health.volunteer')->with('evoluationPart', AppDefault::getEvoluationPart())->with('evoluationForm', AppDefault::getEvoluationForm())
+		->with('villages', $villages)->with('select', $village)->with('numberOfHomeNo', $numberOfHomeNo)->with('firstname', $firstname)->with('lastname', $lastname);
+		
+	}
+	
+	 public function evoluation(Request $request, $formId)
+    {	
+    	
+    	$village = $request->input('village');
+    	$homeNo = $request->input('homeNo');
+    	$firstname = $request->input('firstname');
+    	$lastname = $request->input('lastname');
+    	 
+    	$villages = AppDefault::getArrayVillage();
+    	$arrHomeNo = $this->getHome($village, $homeNo, $firstname, $lastname);
+    	
+    	$formName = AppDefault::getFormName($formId);
+    	$numberOfHomeNo = $arrHomeNo->count();
+    	
+    	$coord = Village::where('village', '=', $village)->first();
+    	
+    	$edgeCoord;
+    	$stringLocation = "";
+    	$isNotSelect;
+    	$arrEdgeCoords = [];
+    	$arrCenterCoords = [];
+    	$centerCoord = AppDefault::CENTER_COORD;
+    	$arrEdgeCoord = [];
+    	$zoom = AppDefault::DEFAULT_ZOOM;
+    	$people = [];
+    	$datapatient = json_encode([]);
+    	$color = "";
+    	$arrVillage = [];
+    	
+    	if($coord != null){
+    		$stringLocation = AppDefault::getStringLocation();
+    		$isNotSelect = false;
+    		$edgeCoord = $coord->edgecoord;
+    		$centerCoord = explode(",", $coord->centercoord);
+    		$color = $coord->color;
+    		if($coord->edgecoord != ""){
+    			$arrEdgeCoord = AppDefault::splitLatLng($edgeCoord);
+    		}
+    		$zoom = 15;
+    		$datapatient = AppDefault::getPatientByForm($village, $firstname, $lastname, $homeNo, $formId);
+    	}else{
+    		$isNotSelect = true;
+    		$local = AppDefault::getArrayVillage();
+    		
+    		$index = 0;
+    		foreach ($local as $obj){
+    			$arrEdgeCoords[$index] = AppDefault::splitLatLng($obj->edgecoord);
+    			$arrCenterCoords[$index] = AppDefault::splitCenterLatLng($obj->centercoord);
+    			$color[$index] = $obj->color;
+    			$arrVillage[$index] = $obj->village;
+    			$index++;
+    		}
+    	}
+
+    	return view('health.evoluation')->with('villages',$villages)->with('select', $village)->with('homeNo', $homeNo)
+    		->with('firstname', $firstname)->with('lastname', $lastname)->with('evoluationPart', AppDefault::getEvoluationPart())
+    		->with('evoluationForm', AppDefault::getEvoluationForm())->with('arrHomeNo', $arrHomeNo)->with('numberOfHomeNo',$numberOfHomeNo)
+    		->with('formName', $formName[0])->with('isNotSelect', json_encode($isNotSelect))->with('arrEdgeCoords', json_encode($arrEdgeCoords))
+    		->with('color', json_encode($color))->with('arrVillage', json_encode($arrVillage))->with('edgeCoord', json_encode($arrEdgeCoord))
+    		->with('centerCoord',$centerCoord)->with('zoom', $zoom)->with('arrCenterCoord', json_encode($arrCenterCoords))->with('dataPatient', $datapatient)
+    		->with('stringLocation', $stringLocation);
+    }
+    
     public function index(Request $request)
     {	
     	$village = $request->input('village');
@@ -107,9 +190,6 @@ class HealthController extends Controller
     	return $data;
     }
     
-    public function evaluation($formId){
-    	dd($formId);
-    }
     
     public function getHome($village, $homeNo, $firstname, $lastname){
     	$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
@@ -123,6 +203,13 @@ class HealthController extends Controller
 	    	->orderBy('patient.HomeNo')
 	    	->groupBy('patient.HomeNo')
 	    	->get();
+    }
+    
+    public function behavior(Request $request){
+    	$villages = AppDefault::getArrayVillage();
+    	$village = $request->input('village');
+    	return view('health.behavior')->with('evoluationPart', AppDefault::getEvoluationPart())->with('evoluationForm', AppDefault::getEvoluationForm())
+    		->with('villages', $villages)->with('select', $village);
     }
     
 }
