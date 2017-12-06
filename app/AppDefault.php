@@ -2,6 +2,7 @@
 namespace App;
 
 use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\This;
 
 class AppDefault
 {
@@ -10,6 +11,8 @@ class AppDefault
 	const DEFAULT_PROVCODE =  "80"; // Nakhonsithammarat
 	const DEFAULT_DISTCODE = "08"; // Thasala
 	const DEFAULT_SUBDISTCODE = "09"; // Thaiburi
+	
+	const DEFAULT_VOLUNTEER_TYPE = "09";
 	
 	public static function getStringLocation(){
 		//location of group people
@@ -142,5 +145,90 @@ class AppDefault
 		}
 		return json_encode($data);
 	}
+	
+	public static function getVolunteer($village, $firstname, $lastname){
+		$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
+		
+		$people = DB::table('house')
+			->leftjoin('person','person.hcode', '=', 'house.hcode')
+			->where('house.villcode', '=', ((int)$village < 10)?$strVillage.'0'.$village: $strVillage.$village)
+			->where('person.fname', 'like', ($firstname==null)?'%':'%'.$firstname.'%')
+			->where('person.lname', 'like', ($lastname==null)?'%':'%'.$lastname.'%')
+			->groupby('house.hno')
+			->orderby('person.fname')
+			->get();
+		
+		return $people;
+	}
+	
+	public static function getPatientByVolunteer($village, $firstname, $lastname){
+		$currentYear = date("Y-mm-dd")+543;
+		$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
+		
+		$volunteer = DB::table('person')
+			->join('house', 'person.pid', '=', 'house.pidvola')
+			->where('house.villcode', '=', ((int)$village < 10)?$strVillage.'0'.$village: $strVillage.$village);
+		if($firstname != null)
+			$volunteer = $volunteer->where('person.fname', 'like', ($firstname==null)?'%':'%'.$firstname.'%');
+		if($lastname != null)
+			$volunteer = $volunteer->where('person.lname', 'like', ($lastname==null)?'%':'%'.$lastname.'%');
+		$volunteer = $volunteer->groupby('house.hno')->get();
+		
+		$arrVolunteer = [];
+		$arrVolunteerName = [];
+		foreach ($volunteer as $obj){
+			$arrVolunteer[] = $obj->pidvola;
+			$arrVolunteerName[$obj->hno] = $obj->fname." ".$obj->lname;
+		}
+		
+		$data = [];
+		foreach ($volunteer as $obj){
+			$volaList = AppDefault::getVolunteerFromPidva($obj->pidvola, $village);
+			$volaList = AppDefault::setVolunteerFromPidvala($volaList, $arrVolunteerName);
+			$data[$obj->pidvola] = $volaList;
+		}
+
+		return $data;
+	}
+	
+	public static function setVolunteerFromPidvala($volaList, $arrVolunteerName){
+		$currentYear = date("Y-mm-dd")+543;
+		$data = [];
+		$index = 0;
+		$homeno = null;
+		$first = true;
+		foreach ($volaList as $obj){
+			$begin = date_create($obj->Birthday);
+			$last = date_create($currentYear);
+			$interval = date_diff($begin, $last);
+			
+			if(!$first){
+				if($homeno != $obj->HomeNo)
+					$index = 0;
+			}else{
+				$first = false;
+			}
+			$data[$obj->HomeNo]['lat'] = $obj->ygis;
+			$data[$obj->HomeNo]['lng'] = $obj->xgis;
+			$data[$obj->HomeNo]['volunteer'] = $arrVolunteerName[$obj->HomeNo];
+			$data[$obj->HomeNo]['data'][$index]['name'] = $obj->Firstname." ".$obj->Sirname;
+			$data[$obj->HomeNo]['data'][$index]['birthday'] = $obj->Birthday;
+			$data[$obj->HomeNo]['data'][$index]['age'] = intval($interval->format('%R%a')/365);
+			$index++;
+			$homeno = $obj->HomeNo;
+		}
+		return $data;
+	}
+	
+	public static function getVolunteerFromPidva($pidvola, $village){
+		$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
+		$people = DB::table('patient')
+			->join('house','patient.HomeNo', '=', 'house.hno')
+			->where('house.villcode', '=', ((int)$village < 10)?$strVillage.'0'.$village: $strVillage.$village)
+			->where('patient.Village', '=', $village)
+			->where('house.pidvola', '=', $pidvola);
+		return $people->orderby('house.hno')->get();
+	}
+	
 }
 

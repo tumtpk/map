@@ -20,20 +20,59 @@ class HealthController extends Controller
 		$lastname = $request->input('lastname');
 		
 		$villages = AppDefault::getArrayVillage();
+		$coord = Village::where('village', '=', $village)->first();
+		 
+		$edgeCoord;
+		$stringLocation = "";
+		$isNotSelect;
+		$arrEdgeCoords = [];
+		$arrCenterCoords = [];
+		$centerCoord = AppDefault::CENTER_COORD;
+		$arrEdgeCoord = [];
+		$zoom = AppDefault::DEFAULT_ZOOM;
+		$people = [];
+		$datapatient = json_encode([]);
+		$color = "";
+		$arrVillage = [];
+		$volunteer = [];
 		
-		$volunteer;
-		if($village != null){
 			
+		if($coord != null){
+			$isNotSelect = false;
+			$volunteer = AppDefault::getVolunteer($village, $firstname, $lastname);
+			$zoom = 15;
+			$stringLocation = AppDefault::getStringLocation();
+			$edgeCoord = $coord->edgecoord;
+			$centerCoord = explode(",", $coord->centercoord);
+			$color = $coord->color;
+			if($coord->edgecoord != ""){
+				$arrEdgeCoord = AppDefault::splitLatLng($edgeCoord);
+			}
+			$datapatient = AppDefault::getPatientByVolunteer($village, $firstname, $lastname);
+		}else{
+			$isNotSelect = true;
+			$local = AppDefault::getArrayVillage();
+		
+			$index = 0;
+			foreach ($local as $obj){
+				$arrEdgeCoords[$index] = AppDefault::splitLatLng($obj->edgecoord);
+				$arrCenterCoords[$index] = AppDefault::splitCenterLatLng($obj->centercoord);
+				$color[$index] = $obj->color;
+				$arrVillage[$index] = $obj->village;
+				$index++;
+			}
 		}
-		$numberOfHomeNo = 0;
 		
 		
 		return view('health.volunteer')->with('evoluationPart', AppDefault::getEvoluationPart())->with('evoluationForm', AppDefault::getEvoluationForm())
-		->with('villages', $villages)->with('select', $village)->with('numberOfHomeNo', $numberOfHomeNo)->with('firstname', $firstname)->with('lastname', $lastname);
+			->with('villages', $villages)->with('select', $village)->with('firstname', $firstname)->with('lastname', $lastname)->with('zoom', $zoom)
+			->with('volunteer', $volunteer)->with('centerCoord', $centerCoord)->with('edgeCoord', json_encode($arrEdgeCoord))->with('color', json_encode($color))
+			->with('isNotSelect', json_encode($isNotSelect))->with('arrEdgeCoords', json_encode($arrEdgeCoords))->with('arrVillage', json_encode($arrVillage))
+			->with('arrCenterCoord', json_encode($arrCenterCoords))->with('dataPatient', json_encode($datapatient))->with('stringLocation', $stringLocation);
 		
 	}
 	
-	 public function evoluation(Request $request, $formId)
+	public function evoluation(Request $request, $formId)
     {	
     	
     	$village = $request->input('village');
