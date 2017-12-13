@@ -1,4 +1,14 @@
 @extends('evoluation')
+@section('css')
+	<style>
+		.mini{
+			height: 28px;
+		}
+		.none-left{
+			padding-left: 0px;		
+		}
+	</style>
+@endsection
 @section('title')
 	{{$formName}}@endsection;
 @section('menu')
@@ -36,7 +46,29 @@
 				<div class="panel panel-default" style="max-height: 600px;">
 
 					<div class="panel-heading">
-						ข้อมูลทั่วไป
+						<div class="row">
+							<div class="col-md-4">
+								ข้อมูลทั่วไป
+							</div>
+							<div class="col-md-4 none-left">
+								<select class="form-control mini">
+									<option>1</option>
+								  	<option>2</option>
+								  	<option>3</option>
+								  	<option>4</option>
+								  	<option>5</option>
+								</select>
+							</div>
+							<div class="col-md-4 none-left">
+								<select class="form-control mini">
+									<option>1</option>
+								  	<option>2</option>
+								  	<option>3</option>
+								  	<option>4</option>
+								  	<option>5</option>
+								</select>
+							</div>
+						</div>	
 					</div>
 		
 				  	<div class="panel-body">
@@ -235,9 +267,17 @@
 										'<th style=\"text-align: center;\">อายุ</th>'+
 										'<th style=\"text-align: center;\">ผลการประเมิน</th>'+
 									'</tr>';
-									var icon = "../images/green.png";
+									var icon, min=0, location="../images/", first=true;
 									dataPatient[data.homeNo].forEach(function(patient) {
-										console.log(patient);
+										if(first){
+											min = patient.score;
+											icon = location+patient.pin+".png";
+											first = false;
+										}else if(patient.score < min){
+											min = patient.score;
+											icon = location+patient.pin+".png";
+										}
+										
 										content += '<tr style=\"background-color:'+patient.row+';\">'+
 											'<td class=\"text-center\">'+patient.name+'</td>'+
 											'<td style=\"text-align: center;\">'+patient.age+'</td>'+

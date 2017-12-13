@@ -101,6 +101,7 @@ class AppDefault
 		foreach ($result as $obj){
 			$arrResult[(int)$obj->id]['pin'] = $obj->pincolor;
 			$arrResult[(int)$obj->id]['row'] = $obj->rowcolor;
+			$arrResult[(int)$obj->id]['score'] = $obj->score_start;
 		}
 	
 		$data = [];
@@ -130,15 +131,8 @@ class AppDefault
 			
 			$data[$obj->HomeNo][$index]['result'] = ($dailyResult == null)?'-':$dailyResult->result_name;
 			$data[$obj->HomeNo][$index]['row'] = ($dailyResult == null)?"":$arrResult[$dailyResult->result_id]['row'];
-			//delete
-			if($dailyResult != null && ($dailyResult->result_id == 4 || $dailyResult->result_id == 5 || $dailyResult->result_id == 6)){
-				$data[$obj->HomeNo][$index]['isRed'] = 1;
-// 				$data[$obj->HomeNo][$index]['color'] = $dailyResult->result_id;
-			}else{
-				$data[$obj->HomeNo][$index]['isRed'] = 0;
-// 				$data[$obj->HomeNo][$index]['color'] = 0;
-			}
-			//delete
+			$data[$obj->HomeNo][$index]['score'] = ($dailyResult == null)?0:$arrResult[$dailyResult->result_id]['score'];
+			$data[$obj->HomeNo][$index]['pin'] = ($dailyResult == null)?"1":$arrResult[$dailyResult->result_id]['pin'];
 	
 			$index++;
 			$homeno = $obj->HomeNo;
