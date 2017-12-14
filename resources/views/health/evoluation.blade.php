@@ -3,6 +3,7 @@
 	<style>
 		.mini{
 			height: 28px;
+			font-size: 12px;
 		}
 		.none-left{
 			padding-left: 0px;		
@@ -50,29 +51,25 @@
 							<div class="col-md-4">
 								ข้อมูลทั่วไป
 							</div>
+							<form action="" method="post">
 							<div class="col-md-4 none-left">
-								<select class="form-control mini">
-									<option>1</option>
-								  	<option>2</option>
-								  	<option>3</option>
-								  	<option>4</option>
-								  	<option>5</option>
+								<select class="form-control mini" name="recordYear" id="recordYear">
+									<?php foreach ($recordYear as $record){ ?>
+										<option value="{{$record->record_years}}" <?php echo ($year == $record->record_years)?"selected":""; ?>>{{"ปี ".$record->record_years}}</option>
+									<?php } ?>
 								</select>
 							</div>
 							<div class="col-md-4 none-left">
-								<select class="form-control mini">
-									<option>1</option>
-								  	<option>2</option>
-								  	<option>3</option>
-								  	<option>4</option>
-								  	<option>5</option>
+								<select class="form-control mini" name="recordTime" id="recordTime">
+									<?php foreach ($recordTime as $record){ ?>
+										<option value="{{$record->record_times}}" <?php echo ($time == $record->record_times)?"selected":""; ?>>{{$record->record_times}}</option>
+									<?php } ?>
 								</select>
 							</div>
 						</div>	
 					</div>
 		
 				  	<div class="panel-body">
-				  		<form action="" method="post">
 				  			{{ csrf_field() }}
 							<div class="form-group">
 							    <select id="village" name="village" class="form-control" placeholder="เลือกหมู่บ้าน">
@@ -208,7 +205,7 @@
 			          	index: arrVillage[index]
 		          	
 			        });
-		        	var icon = "images/white.png"
+		        	var icon = '{{ url('images/white.png') }}';
 		        	marker = new google.maps.Marker({
 						position: new google.maps.LatLng(arrCenterCoord[index].lat, arrCenterCoord[index].lng),
 						map: map,
@@ -386,5 +383,34 @@
 		   	
 		}
 				
-			</script>
+	</script>
+			
+	<script type="text/javascript">
+		$(document).ready(function(){
+		    var recordYear = $('#recordYear').val();
+		    var location = '{{ url('getrecordtime') }}';
+// 		    callOption();
+		    
+		    function renderOption(data){
+		    	$('#recordTime option').remove();
+		    	var vm = $('#recordTime');
+		    	$.each(data, function( index, value ) {
+				    vm.append('<option value="'+value.record_times+'">'+value.record_times+'</option>');
+		    	});
+		    }
+
+		    function callOption(){
+		    	$.post(location, { 'recordYear': recordYear, '_token': '{{ csrf_token() }}' }, function(data){ 
+			    	renderOption(data);
+			    });
+		    }
+
+		    $('#recordYear').change(function(){
+		    	recordYear = $(this).val();
+		    	callOption();
+			})
+			
+		    
+		});
+	</script>
 @endsection

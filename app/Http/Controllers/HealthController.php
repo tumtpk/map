@@ -9,6 +9,7 @@ use App\Village;
 use Illuminate\Support\Facades\DB;
 use App\Patient;
 use App\AppDefault;
+use Illuminate\Support\Facades\Response;
 
 class HealthController extends Controller
 {
@@ -79,9 +80,13 @@ class HealthController extends Controller
     	$homeNo = $request->input('homeNo');
     	$firstname = $request->input('firstname');
     	$lastname = $request->input('lastname');
+    	$year = $request->input('recordYear');
+    	$time = $request->input('recordTime');
     	 
     	$villages = AppDefault::getArrayVillage();
     	$arrHomeNo = $this->getHome($village, $homeNo, $firstname, $lastname);
+    	$recordYear = AppDefault::getRecordTime();
+    	$recordTime = AppDefault::getRecordTimeFromYear("2560");
     	
     	$formName = AppDefault::getFormName($formId);
     	$numberOfHomeNo = $arrHomeNo->count();
@@ -132,7 +137,8 @@ class HealthController extends Controller
     		->with('formName', $formName[0])->with('isNotSelect', json_encode($isNotSelect))->with('arrEdgeCoords', json_encode($arrEdgeCoords))
     		->with('color', json_encode($color))->with('arrVillage', json_encode($arrVillage))->with('edgeCoord', json_encode($arrEdgeCoord))
     		->with('centerCoord',$centerCoord)->with('zoom', $zoom)->with('arrCenterCoord', json_encode($arrCenterCoords))->with('dataPatient', $datapatient)
-    		->with('stringLocation', $stringLocation);
+    		->with('stringLocation', $stringLocation)->with('recordYear', $recordYear)->with('year', $year)->with('time', $time)
+    		->with('recordTime', $recordTime);
     }
     
     public function index(Request $request)
@@ -249,6 +255,12 @@ class HealthController extends Controller
     	$village = $request->input('village');
     	return view('health.behavior')->with('evoluationPart', AppDefault::getEvoluationPart())->with('evoluationForm', AppDefault::getEvoluationForm())
     		->with('villages', $villages)->with('select', $village);
+    }
+    
+    public function getrecordtime(Request $request){
+    	$recordYear = $request->input('recordYear');
+    	$data = AppDefault::getRecordTimeFromYear($recordYear);
+        return \Response::json($data);
     }
     
 }

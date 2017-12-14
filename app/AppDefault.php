@@ -224,5 +224,15 @@ class AppDefault
 		return $people->orderby('house.hno')->get();
 	}
 	
+	public static function getRecordTime(){
+		return DB::table('record_time')
+			->groupby('record_years')->orderby('record_years', 'desc')->get();
+	}
+	
+	public static function getRecordTimeFromYear($recordYear){
+		return $data = DB::table('record_time')->where('record_years', '=', $recordYear)
+    		->orderby('record_times', 'desc')->get();
+	}
+	
 }
 

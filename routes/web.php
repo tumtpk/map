@@ -31,3 +31,5 @@ Route::post('/behavior', 'HealthController@behavior');
 
 Route::get('/volunteer', 'HealthController@volunteer');
 Route::post('/volunteer', 'HealthController@volunteer');
+
+Route::post('/getrecordtime', 'HealthController@getrecordtime');
