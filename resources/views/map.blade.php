@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-    	<meta name="viewport" content="width=device-width, initial-scale=1">
+    	<meta name="viewport" content="width=device-width, initial-scale=1>
         <meta charset="utf-8"  name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title')</title>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
@@ -30,7 +30,15 @@
 		            <li class="active"><a href="health">ตำแหน่งพิกัดของบ้าน</a></li>
 		            <li><a href="behavior">พฤติกรรมสุขภาพ</a></li>
 		            <li><a href="volunteer">อสม.</a></li>
-		            @yield('menu')	
+		            @yield('menu')
+		          </ul>
+		          <ul class="nav navbar-nav navbar-right">
+		          	<li class="dropdown">
+		              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">หฤษฎ์ คงทอง <span class="caret"></span></a>
+		              <ul class="dropdown-menu">
+		                <li><a href="#">ออกจากระบบ</a></li>
+		              </ul>
+		            </li>
 		          </ul>
 		        </div><!--/.nav-collapse -->
 		      </div>

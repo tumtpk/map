@@ -32,6 +32,14 @@
 		            <li><a href="../volunteer">อสม.</a></li>
 		            @yield('menu')	
 		          </ul>
+		          <ul class="nav navbar-nav navbar-right">
+		          	<li class="dropdown">
+		              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">หฤษฎ์ คงทอง <span class="caret"></span></a>
+		              <ul class="dropdown-menu">
+		                <li><a href="#">ออกจากระบบ</a></li>
+		              </ul>
+		            </li>
+		          </ul>
 		        </div><!--/.nav-collapse -->
 		      </div>
 		    </nav>
@@ -63,6 +71,11 @@
         <script async defer src="http://maps.google.com/maps/api/js?key=AIzaSyDXPSZi00oTyASzmu_SzAoA9r2H4zQqT6U&amp;callback=myMap"></script>
         
 		<script type="text/javascript">
+		$('.has-sub a').click(function(){
+			  $('.has-sub ul').hide();
+			  $(this).next().show();
+
+			});
 		
 		$(function(){
 // 		    $("<script/>", {
