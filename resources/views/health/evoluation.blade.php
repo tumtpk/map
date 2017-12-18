@@ -44,7 +44,7 @@
 	<!-- Sidebar -->
 		<div id="sidebar" class="col-md-4">
 			<section>
-				<div class="panel panel-default" style="max-height: 600px;">
+				<div class="panel panel-default" style="max-height: 650px;">
 
 					<div class="panel-heading">
 						<div class="row">
@@ -58,22 +58,20 @@
 				  			<form action="" method="post">
 				  			{{ csrf_field() }}
 				  			
-			  				<div class="form-group">
-								<select class="form-control" name="recordYear" id="recordYear">
+			  				<div class="form-group" style="display: flex;">
+								<select class="form-control" name="recordYear" id="recordYear" style="margin-right: 10px;">
 									<?php foreach ($recordYear as $record){ ?>
 										<option value="{{$record->record_years}}" <?php echo ($year == $record->record_years)?"selected":""; ?>>{{"ปี ".$record->record_years}}</option>
 									<?php } ?>
 								</select>
-							</div>
-							
-							<div class="form-group">
+								
 								<select class="form-control" name="recordTime" id="recordTime">
 									<?php foreach ($recordTime as $record){ ?>
-										<option value="{{$record->record_times}}" <?php echo ($time == $record->record_times)?"selected":""; ?>>{{$record->record_times}}</option>
+										<option value="{{$record->record_times}}" <?php echo ($time == $record->record_times)?"selected":""; ?>>{{"ครั้งที่ ".$record->record_times}}</option>
 									<?php } ?>
 								</select>
 							</div>
-				  			
+							
 							<div class="form-group">
 							    <select id="village" name="village" class="form-control" placeholder="เลือกหมู่บ้าน">
 									<option value="0">เลือกหมู่บ้าน</option>
@@ -83,15 +81,12 @@
 								</select>
 							</div>
 							<div class="form-group">
-							    <!-- <label for="exampleInputPassword1">Password</label> -->
 							    <input type="text" id="homeNo" name="homeNo" class="form-control" placeholder="บ้านเลขที่" value="{{$homeNo}}" disabled="disabled">
 							</div>
 							<div class="form-group">
-							    <!-- <label for="exampleInputPassword1">Password</label> -->
 							    <input type="text" id="firstname" name="firstname" class="form-control" placeholder="ชื่อ" value="{{$firstname}}" disabled="disabled">
 							</div>
 							<div class="form-group">
-							    <!-- <label for="exampleInputEmail1">Email address</label> -->
 							    <input type="text" id="lastname" name="lastname" class="form-control" placeholder="นามสกุล" value="{{$lastname}}" disabled="disabled">
 							</div>
 							<div class="text-right">
@@ -132,7 +127,7 @@
 	<!-- Content -->
 		<div id="content" class="col-md-8" style="padding-left: 10px;">
 			<section>
-				<div id="googleMap" style="width:100%;height:600px;"></div>
+				<div id="googleMap" style="width:100%;height:650px;"></div>
 			</section>
 		</div>
 

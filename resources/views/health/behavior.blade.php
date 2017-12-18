@@ -148,7 +148,7 @@
 	<!-- Content -->
 	<div id="content" class="col-md-8" style="padding-left: 10px;">
 		<section>
-			<div id="googleMap" style="width:100%;height:600px;"></div>
+			<div id="googleMap" style="width:100%;height:700px;"></div>
 		</section>
 	</div>
 
