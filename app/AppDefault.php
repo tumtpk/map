@@ -14,6 +14,34 @@ class AppDefault
 	
 	const DEFAULT_VOLUNTEER_TYPE = "09";
 	
+	const CIGARETTE_NEVER = 1;
+	const CIGARETTE_RARELY = 2;
+	const CIGARETTE_HURLY = 3;
+	const CIGARETTE_ONCE = 4;
+	
+	const DRINK_NEVER = 1;
+	const DRINK_RARELY = 2;
+	const DRINK_HURLY = 3;
+	const DRINK_ONCE = 4;
+	
+	public static function getCigaratte(){
+		return array(
+				self::CIGARETTE_NEVER => "ไม่สูบ",
+				self::CIGARETTE_RARELY => "สูบบ้าง",
+				self::CIGARETTE_HURLY => "สูบประจำ",
+				self::CIGARETTE_ONCE => "เคยสูบ"
+		);
+	}
+	
+	public static function getDrink(){
+		return array(
+				self::DRINK_NEVER => "ไม่ดื่ม",
+				self::DRINK_RARELY => "ดื่มบ้าง",
+				self::DRINK_HURLY => "ดื่มประจำ",
+				self::DRINK_ONCE => "เคยดื่ม"
+		);
+	}
+	
 	public static function getStringLocation(){
 		//location of group people
 		$province = DB::table('cprovince')->where('provcode', AppDefault::DEFAULT_PROVCODE)->value('provname');
@@ -234,5 +262,141 @@ class AppDefault
     		->orderby('record_times', 'desc')->get();
 	}
 	
+	public static function getAllTimeOfPetientRecord(){
+		return DB::table('patient_history')->select('Time')->groupby('Time')
+    		->orderby('Time', 'desc')->get();
+	}
+	
+	public static function getHomeNumberByBehavior($village, $pastillness, $historysurgery, $congenital, $cigarette, $drink, $time){
+		$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
+		$query = DB::table('patient')
+			->join('patient_history','patient.id', '=', 'patient_history.patient_id')
+			->join('house','patient.HomeNo', '=', 'house.hno')
+			->where('house.villcode', '=', ((int)$village < 10)?$strVillage.'0'.$village: $strVillage.$village)
+			->where('patient.Village', '=', $village)
+			->where('patient.Province', '=', AppDefault::DEFAULT_PROVCODE)
+			->where('patient.District', '=', AppDefault::DEFAULT_DISTCODE)
+			->where('patient.Subdistrict', '=', AppDefault::DEFAULT_SUBDISTCODE)
+			->where('patient_history.Time', '=', (int)$time);
+			
+			if($pastillness!=null){
+				$arrPastillness = explode(",", $pastillness);
+				$query->Where(function ($query) use($arrPastillness) {
+					foreach($arrPastillness as $val) {
+						$query->orWhere('patient_history.Pastillness', 'like', '%'.$val.'%');
+					}
+				});
+			}
+			if($historysurgery != null){
+				$arrHistorysurgery = explode(",", $historysurgery);
+				$query->Where(function ($query) use($arrHistorysurgery) {
+					foreach($arrHistorysurgery as $val) {
+						$query->orWhere('patient_history.Historysurgery', 'like', '%'.$val.'%');
+					}
+				});
+			}
+			if($congenital != null){
+				$arrCongenital = explode(",", $congenital);
+				$query->Where(function ($query) use($arrCongenital) {
+					foreach($arrCongenital as $val) {
+						$query->orWhere('patient_history.Congenital', 'like', '%'.$val.'%');
+					}
+				});
+			}
+			if($cigarette != null){
+				$query->where('patient_history.Cigarette', $cigarette);
+			}
+			if($drink != null){
+				$query->where('patient_history.Drink', $drink);
+			}
+			
+			$query->orderBy('patient.HomeNo')
+			->groupBy('patient.HomeNo');
+			
+// 			dd($query->toSql());
+		return $query->get();
+	
+	}
+	
+	public static function getPatientByBehavior($village, $pastillness, $historysurgery, $congenital, $cigarette, $drink, $time){
+		$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
+		$currentYear = date("Y-mm-dd")+543;
+		$query = DB::table('patient')
+		->join('patient_history','patient.id', '=', 'patient_history.patient_id')
+		->join('house','patient.HomeNo', '=', 'house.hno')
+		->where('house.villcode', '=', ((int)$village < 10)?$strVillage.'0'.$village: $strVillage.$village)
+		->where('patient.Village', '=', $village)
+		->where('patient.Province', '=', AppDefault::DEFAULT_PROVCODE)
+		->where('patient.District', '=', AppDefault::DEFAULT_DISTCODE)
+		->where('patient.Subdistrict', '=', AppDefault::DEFAULT_SUBDISTCODE)
+		->where('patient_history.Time', '=', (int)$time);
+			
+		if($pastillness!=null){
+			$arrPastillness = explode(",", $pastillness);
+			$query->Where(function ($query) use($arrPastillness) {
+				foreach($arrPastillness as $val) {
+					$query->orWhere('patient_history.Pastillness', 'like', '%'.$val.'%');
+				}
+			});
+		}
+		if($historysurgery != null){
+			$arrHistorysurgery = explode(",", $historysurgery);
+			$query->Where(function ($query) use($arrHistorysurgery) {
+				foreach($arrHistorysurgery as $val) {
+					$query->orWhere('patient_history.Historysurgery', 'like', '%'.$val.'%');
+				}
+			});
+		}
+		if($congenital != null){
+			$arrCongenital = explode(",", $congenital);
+			$query->Where(function ($query) use($arrCongenital) {
+				foreach($arrCongenital as $val) {
+					$query->orWhere('patient_history.Congenital', 'like', '%'.$val.'%');
+				}
+			});
+		}
+		if($cigarette != null){
+			$query->where('patient_history.Cigarette', $cigarette);
+		}
+		if($drink != null){
+			$query->where('patient_history.Drink', $drink);
+		}
+			
+		$query->orderBy('patient.HomeNo');
+		
+		$people = $query->get();
+		
+		$data = [];
+		$index = 0;
+		$homeno = null;
+		$first = true;
+		foreach ($people as $obj){
+			$begin = date_create($obj->Birthday);
+			$last = date_create($currentYear);
+			$interval = date_diff($begin, $last);
+			 
+			if(!$first){
+				if($homeno != $obj->HomeNo){
+					$index = 0;
+				}
+			}else{
+				$first = false;
+			}
+		
+			$arrCigarette = AppDefault::getCigaratte();
+			$arrDrink = AppDefault::getDrink();
+		
+			$data[$obj->HomeNo][$index]['name'] = $obj->Firstname." ".$obj->Sirname;
+			$data[$obj->HomeNo][$index]['age'] = intval($interval->format('%R%a')/365);
+			$data[$obj->HomeNo][$index]['pastillness'] = ($obj->Pastillness == null)?'-':$obj->Pastillness;
+			$data[$obj->HomeNo][$index]['historysurgery'] = ($obj->Historysurgery == null)?'-':$obj->Historysurgery;
+			$data[$obj->HomeNo][$index]['congenital'] = ($obj->Congenital == null)?'-':$obj->Congenital;
+			$data[$obj->HomeNo][$index]['cigarette'] = ($obj->Cigarette == null)?'-':$arrCigarette[$obj->Cigarette];
+			$data[$obj->HomeNo][$index]['drink'] = ($obj->Drink == null)?'-':$arrDrink[$obj->Drink];
+			$index++;
+			$homeno = $obj->HomeNo;
+		}
+		return $data;
+	}
 }
 

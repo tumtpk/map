@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Patient;
 use App\AppDefault;
 use Illuminate\Support\Facades\Response;
+use Symfony\Component\Console\Descriptor\ApplicationDescription;
 
 class HealthController extends Controller
 {
@@ -148,7 +149,7 @@ class HealthController extends Controller
     	$firstname = $request->input('firstname');
     	$lastname = $request->input('lastname');
     	
-    	$villages = Village::all()->sortBy('village');
+    	$villages = AppDefault::getArrayVillage();
     	$coord = Village::where('village', '=', $village)->first();
     	$isNotSelect;$color;
     	$datapatient = json_encode([]);
@@ -160,10 +161,13 @@ class HealthController extends Controller
     	$zoom = AppDefault::DEFAULT_ZOOM;
     	$centerCoord = AppDefault::CENTER_COORD;
     	
-    	$arrHomeNo = $this->getHome($village, $homeNo, $firstname, $lastname);
-    	$numberOfHomeNo =  sizeof($arrHomeNo);
+    	$numberOfHomeNo = 0;
+    	$arrHomeNo = [];
     	
     	if($coord != null){
+    		$arrHomeNo = $this->getHome($village, $homeNo, $firstname, $lastname);
+    		$numberOfHomeNo =  sizeof($arrHomeNo);
+    		
     		$isNotSelect = false;
     		$edgeCoord = $coord->edgecoord;
     		$centerCoord = explode(",", $coord->centercoord);
@@ -173,7 +177,9 @@ class HealthController extends Controller
     		}
     		$zoom = 15;
     		$datapatient = $this->getPatient($village, $firstname, $lastname, $homeNo);
+    		$numberOfHomeNo =  sizeof($datapatient);
     	}else{
+    		
     		$isNotSelect = true;
     		$local = AppDefault::getArrayVillage();
     		
@@ -251,10 +257,66 @@ class HealthController extends Controller
     }
     
     public function behavior(Request $request){
-    	$villages = AppDefault::getArrayVillage();
+    	
     	$village = $request->input('village');
+    	$pastillness = $request->input('pastillness');
+    	$historysurgery = $request->input('historysurgery');
+    	$congenital = $request->input('congenital');
+    	$time = $request->input('time');
+    	$cigarette = (int)$request->input('cigarette');
+    	$drink = (int)$request->input('drink');
+    	
+    	//list paramiter on input
+    	$villages = AppDefault::getArrayVillage();
+    	$times = AppDefault::getAllTimeOfPetientRecord();
+    	
+    	//init parameter
+    	$numberOfHomeNo = 0;
+    	$coord = Village::where('village', '=', $village)->first();
+    	$arrHomeNo = [];
+    	$zoom = AppDefault::DEFAULT_ZOOM;
+    	$centerCoord = AppDefault::CENTER_COORD;
+    	$datapatient = json_encode([]);
+    	$arrEdgeCoord = [];
+    	$arrEdgeCoords = [];
+    	$arrVillage = [];
+    	$arrCenterCoords = [];
+    	$color;
+    	
+    	if($coord != null){
+    		$arrHomeNo = AppDefault::getHomeNumberByBehavior($village, $pastillness, $historysurgery, $congenital, $cigarette, $drink, $time);
+    		$numberOfHomeNo =  sizeof($arrHomeNo);
+    		
+    		$isNotSelect = false;
+    		$edgeCoord = $coord->edgecoord;
+    		$centerCoord = explode(",", $coord->centercoord);
+    		$color = $coord->color;
+    		if($coord->edgecoord != ""){
+    			$arrEdgeCoord = AppDefault::splitLatLng($edgeCoord);
+    		}
+    		$zoom = 15;
+    		$datapatient = AppDefault::getPatientByBehavior($village, $pastillness, $historysurgery, $congenital, $cigarette, $drink, $time);
+    	}else{
+    		$isNotSelect = true;
+    		$local = AppDefault::getArrayVillage();
+    		
+    		$index = 0;
+    		foreach ($local as $obj){
+    			$arrEdgeCoords[$index] = AppDefault::splitLatLng($obj->edgecoord);
+    			$arrCenterCoords[$index] = AppDefault::splitCenterLatLng($obj->centercoord);
+    			$color[$index] = $obj->color;
+    			$arrVillage[$index] = $obj->village;
+    			$index++;
+    		}
+    	}
+
     	return view('health.behavior')->with('evoluationPart', AppDefault::getEvoluationPart())->with('evoluationForm', AppDefault::getEvoluationForm())
-    		->with('villages', $villages)->with('select', $village);
+    		->with('villages', $villages)->with('select', $village)->with('pastillness', $pastillness)->with('historysurgery', $historysurgery)
+    		->with('congenital', $congenital)->with('times', $times)->with('time', $time)->with('numberOfHomeNo', $numberOfHomeNo)->with('arrHomeNo', $arrHomeNo)
+    		->with('arrCigaratte', AppDefault::getCigaratte())->with('cigarette', $cigarette)->with('arrDrink', AppDefault::getDrink())->with('drink', $drink)
+    		->with('zoom', $zoom)->with('centerCoord', $centerCoord)->with('edgeCoord', json_encode($arrEdgeCoord))->with('color', json_encode($color))
+    		->with('isNotSelect', json_encode($isNotSelect))->with('arrEdgeCoords', json_encode($arrEdgeCoords))->with('arrVillage', json_encode($arrVillage))
+    		->with('arrCenterCoord', json_encode($arrCenterCoords))->with('dataPatient', json_encode($datapatient))->with('stringLocation', AppDefault::getStringLocation());
     }
     
     public function getrecordtime(Request $request){

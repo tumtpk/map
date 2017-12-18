@@ -51,26 +51,29 @@
 							<div class="col-md-4">
 								ข้อมูลทั่วไป
 							</div>
-							<form action="" method="post">
-							<div class="col-md-4 none-left">
-								<select class="form-control mini" name="recordYear" id="recordYear">
+						</div>	
+					</div>
+		
+				  	<div class="panel-body">
+				  			<form action="" method="post">
+				  			{{ csrf_field() }}
+				  			
+			  				<div class="form-group">
+								<select class="form-control" name="recordYear" id="recordYear">
 									<?php foreach ($recordYear as $record){ ?>
 										<option value="{{$record->record_years}}" <?php echo ($year == $record->record_years)?"selected":""; ?>>{{"ปี ".$record->record_years}}</option>
 									<?php } ?>
 								</select>
 							</div>
-							<div class="col-md-4 none-left">
-								<select class="form-control mini" name="recordTime" id="recordTime">
+							
+							<div class="form-group">
+								<select class="form-control" name="recordTime" id="recordTime">
 									<?php foreach ($recordTime as $record){ ?>
 										<option value="{{$record->record_times}}" <?php echo ($time == $record->record_times)?"selected":""; ?>>{{$record->record_times}}</option>
 									<?php } ?>
 								</select>
 							</div>
-						</div>	
-					</div>
-		
-				  	<div class="panel-body">
-				  			{{ csrf_field() }}
+				  			
 							<div class="form-group">
 							    <select id="village" name="village" class="form-control" placeholder="เลือกหมู่บ้าน">
 									<option value="0">เลือกหมู่บ้าน</option>

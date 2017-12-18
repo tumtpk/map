@@ -1,5 +1,12 @@
 @extends('map')
 @section('title', 'อสม.')
+@section('css')
+	<style>
+		#table-scroll {
+		    height: 270px;
+		}
+	</style>
+@endsection
 @section('menu')
 <li>
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">การประเมิน<b class="caret"></b></a>
@@ -144,7 +151,7 @@
 		          	index: arrVillage[index]
 	          	
 		        });
-	        	var icon = "images/white.png"
+	        	var icon = '{{ url('images/white.png') }}';
 	        	marker = new google.maps.Marker({
 					position: new google.maps.LatLng(arrCenterCoord[index].lat, arrCenterCoord[index].lng),
 					map: map,
@@ -194,7 +201,7 @@
         
 		function setLatLng(){
 			var marker, info;
-			var icon = "images/green.png"
+			var icon = '{{ url('images/1.png') }}';
 			var i=0;
 			var dataPatient = <?=$dataPatient ?>;
 			var village = $('#village').val();
