@@ -87,7 +87,7 @@ class HealthController extends Controller
     	$villages = AppDefault::getArrayVillage();
     	$arrHomeNo = $this->getHome($village, $homeNo, $firstname, $lastname);
     	$recordYear = AppDefault::getRecordTime();
-    	$recordTime = AppDefault::getRecordTimeFromYear("2560");
+    	$recordTime = AppDefault::getRecordTimeFromYear(($year==null)?$recordYear->first()->record_years:$year);
     	
     	$formName = AppDefault::getFormName($formId);
     	$numberOfHomeNo = $arrHomeNo->count();
@@ -117,7 +117,7 @@ class HealthController extends Controller
     			$arrEdgeCoord = AppDefault::splitLatLng($edgeCoord);
     		}
     		$zoom = 15;
-    		$datapatient = AppDefault::getPatientByForm($village, $firstname, $lastname, $homeNo, $formId);
+    		$datapatient = AppDefault::getPatientByForm($village, $firstname, $lastname, $homeNo, $formId, $year, $time);
     	}else{
     		$isNotSelect = true;
     		$local = AppDefault::getArrayVillage();
@@ -220,9 +220,6 @@ class HealthController extends Controller
     	$homeno = null;
     	$first = true;
     	foreach ($people as $obj){
-    		$begin = date_create($obj->Birthday);
-    		$last = date_create($currentYear);
-    		$interval = date_diff($begin, $last);
     
     		if(!$first){
     			if($homeno != $obj->HomeNo){
@@ -233,8 +230,8 @@ class HealthController extends Controller
     		}
     
     		$data[$obj->HomeNo][$index]['name'] = $obj->Firstname." ".$obj->Sirname;
-    		$data[$obj->HomeNo][$index]['birthday'] = $obj->Birthday;
-    		$data[$obj->HomeNo][$index]['age'] = intval($interval->format('%R%a')/365);
+    		$data[$obj->HomeNo][$index]['birthday'] = AppDefault::getStringBirthdate($obj->Birthday);
+    		$data[$obj->HomeNo][$index]['age'] = AppDefault::calAge($obj->Birthday);
     		$index++;
     		$homeno = $obj->HomeNo;
     	}
@@ -269,6 +266,10 @@ class HealthController extends Controller
     	//list paramiter on input
     	$villages = AppDefault::getArrayVillage();
     	$times = AppDefault::getAllTimeOfPetientRecord();
+    	
+    	if($village != null){
+    		$time = $times->first()->Time;
+    	}
     	
     	//init parameter
     	$numberOfHomeNo = 0;

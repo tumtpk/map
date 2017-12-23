@@ -3,6 +3,7 @@ namespace App;
 
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\This;
+use Carbon\Carbon;
 
 class AppDefault
 {
@@ -110,7 +111,7 @@ class AppDefault
 		->pluck('name');
 	}
 	
-	public static function getPatientByForm($village, $firstname, $lastname, $homeNo, $formId){
+	public static function getPatientByForm($village, $firstname, $lastname, $homeNo, $formId, $year, $time){
 		$currentYear = date("Y-mm-dd")+543;
 		$strVillage = AppDefault::DEFAULT_PROVCODE.AppDefault::DEFAULT_DISTCODE.AppDefault::DEFAULT_SUBDISTCODE;
 		// people in village
@@ -137,9 +138,6 @@ class AppDefault
 		$homeno = null;
 		$first = true;
 		foreach ($people as $obj){
-			$begin = date_create($obj->Birthday);
-			$last = date_create($currentYear);
-			$interval = date_diff($begin, $last);
 	
 			if(!$first){
 				if($homeno != $obj->HomeNo){
@@ -150,10 +148,12 @@ class AppDefault
 			}
 			 
 			$data[$obj->HomeNo][$index]['name'] = $obj->Firstname." ".$obj->Sirname;
-			$data[$obj->HomeNo][$index]['age'] = intval($interval->format('%R%a')/365);
+			$data[$obj->HomeNo][$index]['age'] = AppDefault::calAge($obj->Birthday);
 			$dailyResult = DB::table('evoluation_result')
 				->where('form_id', $formId)
 				->where('patient_id', $obj->id)
+				->where('years', $year)
+				->where('times', $time)
 				->orderBy('date', 'desc')
 				->first();
 			
@@ -220,9 +220,6 @@ class AppDefault
 		$homeno = null;
 		$first = true;
 		foreach ($volaList as $obj){
-			$begin = date_create($obj->Birthday);
-			$last = date_create($currentYear);
-			$interval = date_diff($begin, $last);
 			
 			if(!$first){
 				if($homeno != $obj->HomeNo)
@@ -234,8 +231,8 @@ class AppDefault
 			$data[$obj->HomeNo]['lng'] = $obj->xgis;
 			$data[$obj->HomeNo]['volunteer'] = $arrVolunteerName[$obj->HomeNo];
 			$data[$obj->HomeNo]['data'][$index]['name'] = $obj->Firstname." ".$obj->Sirname;
-			$data[$obj->HomeNo]['data'][$index]['birthday'] = $obj->Birthday;
-			$data[$obj->HomeNo]['data'][$index]['age'] = intval($interval->format('%R%a')/365);
+			$data[$obj->HomeNo]['data'][$index]['birthday'] = AppDefault::getStringBirthdate($obj->Birthday);
+			$data[$obj->HomeNo]['data'][$index]['age'] =AppDefault::calAge($obj->Birthday);
 			$index++;
 			$homeno = $obj->HomeNo;
 		}
@@ -371,9 +368,6 @@ class AppDefault
 		$homeno = null;
 		$first = true;
 		foreach ($people as $obj){
-			$begin = date_create($obj->Birthday);
-			$last = date_create($currentYear);
-			$interval = date_diff($begin, $last);
 			 
 			if(!$first){
 				if($homeno != $obj->HomeNo){
@@ -387,7 +381,7 @@ class AppDefault
 			$arrDrink = AppDefault::getDrink();
 		
 			$data[$obj->HomeNo][$index]['name'] = $obj->Firstname." ".$obj->Sirname;
-			$data[$obj->HomeNo][$index]['age'] = intval($interval->format('%R%a')/365);
+			$data[$obj->HomeNo][$index]['age'] = AppDefault::calAge($obj->Birthday);
 			$data[$obj->HomeNo][$index]['pastillness'] = ($obj->Pastillness == null)?'-':$obj->Pastillness;
 			$data[$obj->HomeNo][$index]['historysurgery'] = ($obj->Historysurgery == null)?'-':$obj->Historysurgery;
 			$data[$obj->HomeNo][$index]['congenital'] = ($obj->Congenital == null)?'-':$obj->Congenital;
@@ -397,6 +391,28 @@ class AppDefault
 			$homeno = $obj->HomeNo;
 		}
 		return $data;
+	}
+	
+	public static function calAge($date){
+		if($date != null){
+			$age = (new Carbon($date))->age;	
+		}else{
+			$age = '-';
+		}
+		
+		return $age;
+	}
+	
+	public static function getStringBirthdate($birthdate){
+		if($birthdate != null){
+			$dt = new Carbon($birthdate);
+			$dt->addYears(543);
+			$birthdate = $dt->format('d/m/Y');
+		}else{
+			$birthdate = '-';
+		}
+		
+		return $birthdate;
 	}
 }
 

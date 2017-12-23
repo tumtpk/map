@@ -393,7 +393,7 @@
 		    	$('#recordTime option').remove();
 		    	var vm = $('#recordTime');
 		    	$.each(data, function( index, value ) {
-				    vm.append('<option value="'+value.record_times+'">'+value.record_times+'</option>');
+				    vm.append('<option value="'+value.record_times+'">'+'ครั้งที่ ' +value.record_times+'</option>');
 		    	});
 		    }
 
